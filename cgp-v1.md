@@ -1,18 +1,18 @@
 ## Cross-Chain Gateway Protocol V1
 
-Team Axelar 
+Team Axelar
 
-### Background 
+### Background
 
-The cross-chain gateway protocol specifies message and packet semantics necessary to establish end-to-end cross-blockchain communication. The interface allows dApps to rely on established message semantics. The protocol has been designed adhering to simple principles of network connectivity to satisfy high modularity, support innovation at the consensus and interoperability layers, while allowing developers to build `future-proof` dApps. 
+The cross-chain gateway protocol specifies message and packet semantics necessary to establish end-to-end cross-blockchain communication. The interface allows dApps to rely on established message semantics. The protocol has been designed adhering to simple principles of network connectivity to satisfy high modularity, support innovation at the consensus and interoperability layers, while allowing developers to build `future-proof` dApps.
 
-Robust interoperability unifies developer experiences, allowing developers to build on the best stack for their use case & still compose with other ecosystems. Furthermore, it gives the power to developers to build dApps with simple UX, allowing any user to interact with chain with 1-click. 
+Robust interoperability unifies developer experiences, allowing developers to build on the best stack for their use case & still compose with other ecosystems. Furthermore, it gives the power to developers to build dApps with simple UX, allowing any user to interact with chain with 1-click.
 
-Principles of network connectivity were studied for decades during the development of the Internet. As a result of decades of research and experimentation, the Internet Protocol was born. Its simple, elegant, and still powers all of Internet communication. We define a similarly simple protocol to abstract interoperability across blockchains. It's designed with the same core principles and allows innovation in blockchain layers to continuing evolving.  
+Principles of network connectivity were studied for decades during the development of the Internet. As a result of decades of research and experimentation, the Internet Protocol was born. Its simple, elegant, and still powers all of Internet communication. We define a similarly simple protocol to abstract interoperability across blockchains. It's designed with the same core principles and allows innovation in blockchain layers to continuing evolving.
 
-### Design Goals 
+### Design Goals
 
-We summarize four properties of network connectivity following Cerf and Kahn'74 with additional blockchain specific properties. 
+We summarize four properties of network connectivity following Cerf and Kahn'74 with additional blockchain specific properties.
 
 1.  No changes are required to integrate. Each distinct network needs to stand on its own, and no internal changes need to be required to any such network to connect it.
 2. Gateway-based connectivity. Individual blockchains should connect to other networks via black boxes (gateways). These black boxes retain no information about the individual packet flows passing through them, thereby keeping them simple and avoiding complicated adaptation and recovery from various failure modes.
@@ -21,36 +21,36 @@ We summarize four properties of network connectivity following Cerf and Kahn'74 
 
 We introduce two additional properties necessary in the context of cross-blockchain communication.
 
-5. Cross-chain Safety. Given chains A & B, an interoperability protocol P, and a transaction TX between them [e. g., source=A, destination=B], P(TX) = true at the destination chain iff TX is accepted and finalized by the source chain. 
+5. Cross-chain Safety. Given chains A & B, an interoperability protocol P, and a transaction TX between them [e. g., source=A, destination=B], P(TX) = true at the destination chain iff TX is accepted and finalized by the source chain.
 6. Eventual Liveness. Given chains A & B, an interoperability protocol P, and a transaction TX between them [e. g., source=A, destination=B] that is finalized on the source chain, TX will eventually be delivered to the destination chain. (Assuming underlying liveness properties of A, B & P).
 
 
 ### The Three Interoperability Layers
 
-Interoperability in blockchains is centered around defining 3 layers: message semantics, validation, and transport. 
-Message semantics refers to the "header of envelope" to send messages from one chain to another, and the format of their delivery. This is the layer that applications interact with. Below it, are validation and transport mechanics of interoperability protocols. Validation specifies how the messages are authenticated to establish trust. It can be native (using light-clients) or external (using multi-sigs, optimistic, or decentralized validator networks). Application shall not need to interact with "internals" of these layers, but they rely on them for safety and liveness. 
+Interoperability in blockchains is centered around defining 3 layers: message semantics, validation, and transport.
+Message semantics refers to the "header of envelope" to send messages from one chain to another, and the format of their delivery. This is the layer that applications interact with. Below it, are validation and transport mechanics of interoperability protocols. Validation specifies how the messages are authenticated to establish trust. It can be native (using light-clients) or external (using multi-sigs, optimistic, or decentralized validator networks). Application shall not need to interact with "internals" of these layers, but they rely on them for safety and liveness.
 
-### Mapping Interop Layers to Design Goals 
+### Mapping Interop Layers to Design Goals
 
-| Layer        | Design Goals   | 
-| :------------- |:-------------| 
-| Message semantics      | No changes are required to integrate <br /> Gateway-based connectivity | 
-| Validation      | Cross-chain safety      |  
-| Transport | Eventual liveness <br /> Best effort intermediate communication |    
+| Layer        | Design Goals   |
+| :------------- |:-------------|
+| Message semantics      | No changes are required to integrate <br /> Gateway-based connectivity |
+| Validation      | Cross-chain safety      |
+| Transport | Eventual liveness <br /> Best effort intermediate communication |
 
 ### Protocol Overview
 
-#### Uniquely referencing a transaction on the source chain. 
+#### Uniquely referencing a transaction on the source chain.
 
-For every transaction originated on the source chain, we assume there exists a unique identifier. Moreover, its uniqueness should preserved across all blockchains (no two transactions should ever have the same identifier even if the same user submits the same action across multiple chains). For instance, every EVM chain has a `txhash:index` that maybe be used as an identifier. Assuming all EVM chains use distinct `chain_id`s, then even a user with the same public key across multiple chains, submitting the same action, will produce unique identifiers. 
+For every transaction originated on the source chain, we assume there exists a unique identifier. Moreover, its uniqueness should preserved across all blockchains (no two transactions should ever have the same identifier even if the same user submits the same action across multiple chains). For instance, every EVM chain has a `txhash:index` that maybe be used as an identifier. Assuming all EVM chains use distinct `chain_id`s, then even a user with the same public key across multiple chains, submitting the same action, will produce unique identifiers.
 
-When this property cannot be preserved, middleware systems or special purpose smart contracts need to enforce it by adding unique or pseudorandom nonces. 
+When this property cannot be preserved, middleware systems or special purpose smart contracts need to enforce it by adding unique or pseudorandom nonces.
 
-#### The smart contracts & events 
+#### The smart contracts & events
 
 On each chain, two (or more) contracts need to be instantiated, call them `Gateway` and `Verifier`. The `Gateway` specifies the messages semantics for sending and receiving messages and `Verifier` specifies the validation rules that are applied to provide safety. `Verifier` contract logic may be upgraded or improved without requiring any interface changes, as the applications only need to speak to the `Gateway`.
 
-1. DApps sending outgoing messages 
+1. DApps sending outgoing messages
 ```
 
     function callContract(
@@ -60,33 +60,56 @@ On each chain, two (or more) contracts need to be instantiated, call them `Gatew
     ) external {
         emit ContractCall(msg.sender, destinationChain, destinationContractAddress, keccak256(payload), payload);
     }
+
+    function callContractWithToken(
+        string calldata destinationChain,
+        string calldata destinationContractAddress,
+        bytes calldata payload,
+        string calldata symbol,
+        uint256 amount
+    ) external {
+        ...
+
+        emit ContractCallWithToken(msg.sender, destinationChain, destinationContractAddress, keccak256(payload), payload, symbol, amount);
+    }
+
+    function sendToken(
+        string calldata destinationChain,
+        string calldata destinationAddress,
+        string calldata symbol,
+        uint256 amount
+    ) external {
+        ...
+
+        emit TokenSent(msg.sender, destinationChain, destinationAddress, symbol, amount);
+    }
 ```
 
-The above call fully specifies the `packet` with all relevant fields `(sender address, sender chain, destination address, destination chain, payload)`. 
+The above calls fully specify the `packet` with all relevant fields.
 
-Furthermore, as discussed above, the transaction can be identified by its unique `txhash:index`. 
+Furthermore, as discussed above, the transaction can be identified by its unique `txhash:index`.
 
-3. Middleware, such as relayers and or validator networks read events from the gateway that define the packet, and subsequently process them by preparing a message that needs to be posted on the destination chain. 
+3. Middleware, such as relayers and or validator networks read events from the gateway that define the packet, and subsequently process them by preparing a message that needs to be posted on the destination chain.
 
-Dealing with duplicate postings at the destination chain. Should be de-duped assuming every transaction is uniquely identifiable by its source hash/identifier.  
+Dealing with duplicate postings at the destination chain. Should be de-duped assuming every transaction is uniquely identifiable by its source hash/identifier.
 
-4. Middleware posting incoming messages.  
+4. Middleware posting incoming messages.
 
-5. Application receiving and executing messages. 
+5. Application receiving and executing messages.
 
-Duplicate execution.  Gateway masks transactions as `executed` once the receiving contract calls it. It's up for the application to check that the gateway transaction has already been executed. 
+Duplicate execution.  Gateway masks transactions as `executed` once the receiving contract calls it. It's up for the application to check that the gateway transaction has already been executed.
 
-### Composability and Extension to Non-EVM Chains  
+### Composability and Extension to Non-EVM Chains
 
-### Notes 
+### Notes
 
-* Assuming liveness of middleware, source and destination chains, the above semantics gurantee eventual unordered delivery. That is, packets can arrive out of order. This is important for interoperability across heterogenious systems. Because the blockchains can be very much "out of sync" and multiple dApps can use the same gateway, we do not want one packet to hold many others. 
+* Assuming liveness of middleware, source and destination chains, the above semantics gurantee eventual unordered delivery. That is, packets can arrive out of order. This is important for interoperability across heterogenious systems. Because the blockchains can be very much "out of sync" and multiple dApps can use the same gateway, we do not want one packet to hold many others.
 
 * More sophisticated protocols, like 2-way calls, sends to multiple chains, sequenced execution can be built as `application-level` protocols on top of unordered semantics. (Think TCP on top of IP).
 
-* How transactions are posted (and how gas is calculated) is excluded from the specifications. However, `anyone` is able to post message [no permissed relayers] to gurantee high liveness. A middleware / relayer may batch multiple calls to save gas, or execute them based on any custom policy deemed needed. 
+* How transactions are posted (and how gas is calculated) is excluded from the specifications. However, `anyone` is able to post message [no permissed relayers] to gurantee high liveness. A middleware / relayer may batch multiple calls to save gas, or execute them based on any custom policy deemed needed.
 
-### Instantiation 
+### Instantiation
 
-Link to Axelar gateway implementations. 
+Link to Axelar gateway implementations.
 
