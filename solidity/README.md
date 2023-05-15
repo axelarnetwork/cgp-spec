@@ -12,10 +12,10 @@ npm run build
 
 ## Design
 
-[AxelarGateway](contracts/AxelarGateway.sol): The entrypoint for the CGP protocol. Interchain messages can be initiated by calling `callContract` method. The message will be relayed via Axelar network according to the custom authentication rules for the connection. On the destination chain, `execute` method is called to record an approval for the message. The app can then call `validateContractCall` to verify the approval and execute the contract call with the payload.
+[AxelarGateway](contracts/AxelarGateway.sol): The entrypoint for the CGP protocol. Interchain messages can be initiated by calling `callContract` method. The message will be relayed via Axelar network according to the custom authentication rules for the connection. On the destination chain, `execute` method is called to record an approval for the message.
 
-[AxelarAuthWeighted](contracts/auth/AxelarAuthWeighted.sol): The default authentication contract for Axelar network. It allows the sender to specify a list of validators and the corresponding weights. The message is approved if the sum of weights of the validators who have signed the message is greater than the threshold.
+[AxelarAuthWeighted](contracts/auth/AxelarAuthWeighted.sol): The authentication contract . It allows the sender to specify a list of validators and the corresponding weights. The message is approved if the sum of weights of the validators who have signed the message is greater than the threshold.
 
-For an initial release of the Axelar Gateway contract on new smart contract platforms,
-it is recommended to implement some upgradability mechanism to allow reacting to potential bugs.
-If the VM doesn't support upgradability natively, additional contracts might be needed to support it (e.g. in solidity). Additionally, a multisig wallet (potentially an on-chain contract) will be needed to manage upgrades.
+[AxelarExecutable](contracts/executable/AxelarExecutable.sol): A common interface for Axelar powered apps. A relayer can trigger the `execute` method of the app, which will validate if an approval for the payload has been recorded at the gateway, and then execute the custom app logic.
+
+Auxiliary contracts might include an ability to upgrade the gateway contract, and a multisig smart contract wallet to manage upgrades of the gateway.
