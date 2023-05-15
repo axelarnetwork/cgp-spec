@@ -61,43 +61,48 @@ On each chain, two (or more) contracts need to be instantiated, call them `Gatew
         emit ContractCall(msg.sender, destinationChain, destinationContractAddress, keccak256(payload), payload);
     }
 
-    function callContractWithToken(
-        string calldata destinationChain,
-        string calldata destinationContractAddress,
-        bytes calldata payload,
-        string calldata symbol,
-        uint256 amount
-    ) external {
-        ...
-
-        emit ContractCallWithToken(msg.sender, destinationChain, destinationContractAddress, keccak256(payload), payload, symbol, amount);
-    }
-
-    function sendToken(
-        string calldata destinationChain,
-        string calldata destinationAddress,
-        string calldata symbol,
-        uint256 amount
-    ) external {
-        ...
-
-        emit TokenSent(msg.sender, destinationChain, destinationAddress, symbol, amount);
-    }
 ```
 
 The above calls fully specify the `packet` with all relevant fields.
 
 Furthermore, as discussed above, the transaction can be identified by its unique `txhash:index`.
 
-3. Middleware, such as relayers and or validator networks read events from the gateway that define the packet, and subsequently process them by preparing a message that needs to be posted on the destination chain.
+2. Middleware, such as relayers and or network validators read events from the gateway that define the packet, and subsequently process them by preparing a message that needs to be posted on the destination chain.
 
 Dealing with duplicate postings at the destination chain. Should be de-duped assuming every transaction is uniquely identifiable by its source hash/identifier.
 
-4. Middleware posting incoming messages.
+3. Middleware posting incoming messages to the destination gateway for approval.
+```
+    function approveContractCall(bytes calldata params, bytes32 commandId) external onlySelf {
+        (
+            string memory sourceChain,
+            string memory sourceAddress,
+            address contractAddress,
+            bytes32 payloadHash,
+            bytes32 sourceTxHash,
+            uint256 sourceEventIndex
+        ) = abi.decode(params, (string, string, address, bytes32, bytes32, uint256));
 
-5. Application receiving and executing messages.
+        _setContractCallApproved(commandId, sourceChain, sourceAddress, contractAddress, payloadHash);
+        emit ContractCallApproved(commandId, sourceChain, sourceAddress, contractAddress, payloadHash, sourceTxHash, sourceEventIndex);
+    }
+```
+The gateway marks the message as `approved`, which means it is ready to be executed.
 
-Duplicate execution.  Gateway masks transactions as `executed` once the receiving contract calls it. It's up for the application to check that the gateway transaction has already been executed.
+4. Application receiving and executing messages.
+```
+    function validateContractCall(
+        bytes32 commandId,
+        string calldata sourceChain,
+        string calldata sourceAddress,
+        bytes32 payloadHash
+    ) external override returns (bool valid) {
+        bytes32 key = _getIsContractCallApprovedKey(commandId, sourceChain, sourceAddress, msg.sender, payloadHash);
+        valid = getBool(key);
+        if (valid) _setBool(key, false);
+    }
+```
+For executing the messages, application contract is responsible for calling `validateContractCall` on the destination gateway to validate the approval and only allow execution if it returns `true`. Gateway marks the message as `executed` once the validate function is called. It's up for the application to check that the gateway transaction has already been executed.
 
 ### Composability and Extension to Non-EVM Chains
 
