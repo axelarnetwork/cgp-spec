@@ -7,9 +7,9 @@ import { IAxelarAuth } from './interfaces/IAxelarAuth.sol';
 
 import { ECDSA } from './auth/ECDSA.sol';
 import { EternalStorage } from './util/EternalStorage.sol';
-import { Upgradable } from './util/Upgradable.sol';
+import { Ownable } from './util/Ownable.sol';
 
-contract AxelarGateway is Upgradable, EternalStorage, IAxelarGateway {
+contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
     bytes32 internal constant PREFIX_COMMAND_EXECUTED = keccak256('command-executed');
     bytes32 internal constant PREFIX_CONTRACT_CALL_APPROVED = keccak256('contract-call-approved');
 
@@ -70,18 +70,6 @@ contract AxelarGateway is Upgradable, EternalStorage, IAxelarGateway {
 
     function isCommandExecuted(bytes32 commandId) public view override returns (bool) {
         return getBool(_getIsCommandExecutedKey(commandId));
-    }
-
-    /*********************\
-    |* Upgrade Functions *|
-    \*********************/
-
-    function _setup(bytes calldata params) internal override {
-        if (params.length != 0) {
-            IAxelarAuth(AUTH_MODULE).transferOperatorship(params);
-
-            emit OperatorshipTransferred(params);
-        }
     }
 
     /**********************\
@@ -196,9 +184,5 @@ contract AxelarGateway is Upgradable, EternalStorage, IAxelarGateway {
         bytes32 payloadHash
     ) internal {
         _setBool(_getIsContractCallApprovedKey(commandId, sourceChain, sourceAddress, contractAddress, payloadHash), true);
-    }
-
-    function contractId() external pure returns (bytes32) {
-        return keccak256('axelar-gateway');
     }
 }

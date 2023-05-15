@@ -14,7 +14,7 @@ contract AxelarAuthWeighted is Ownable, IAxelarAuthWeighted {
     // solhint-disable-next-line var-name-mixedcase
     uint256 internal constant OLD_KEY_RETENTION = 16;
 
-    constructor(bytes[] memory recentOperators) Ownable(msg.sender) {
+    constructor(bytes[] memory recentOperators) {
         uint256 length = recentOperators.length;
 
         for (uint256 i; i < length; ++i) {
