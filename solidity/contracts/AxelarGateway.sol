@@ -18,12 +18,12 @@ contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
     bytes32 internal constant SELECTOR_TRANSFER_OPERATORSHIP = keccak256('transferOperatorship');
 
     // solhint-disable-next-line var-name-mixedcase
-    address internal immutable AUTH_MODULE;
+    IAxelarAuth internal immutable AUTH_MODULE;
 
     constructor(address authModule_) {
         if (authModule_.code.length == 0) revert InvalidAuthModule();
 
-        AUTH_MODULE = authModule_;
+        AUTH_MODULE = IAxelarAuth(authModule_);
     }
 
     modifier onlySelf() {
@@ -72,7 +72,7 @@ contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
     \***********/
 
     function authModule() public view returns (address) {
-        return AUTH_MODULE;
+        return address(AUTH_MODULE);
     }
 
     function isCommandExecuted(bytes32 commandId) public view override returns (bool) {
@@ -101,7 +101,7 @@ contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
         bytes32 messageHash = ECDSA.toEthSignedMessageHash(keccak256(data));
 
         // returns true for current operators
-        bool allowOperatorshipTransfer = IAxelarAuth(AUTH_MODULE).validateProof(messageHash, proof);
+        bool allowOperatorshipTransfer = AUTH_MODULE.validateProof(messageHash, proof);
 
         uint256 chainId;
         bytes32[] memory commandIds;
@@ -164,7 +164,7 @@ contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
     }
 
     function transferOperatorship(bytes calldata newOperatorsData, bytes32) external onlySelf {
-        IAxelarAuth(AUTH_MODULE).transferOperatorship(newOperatorsData);
+        AUTH_MODULE.transferOperatorship(newOperatorsData);
 
         emit OperatorshipTransferred(newOperatorsData);
     }
