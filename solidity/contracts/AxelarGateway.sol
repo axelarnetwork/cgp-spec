@@ -12,6 +12,7 @@ import { Ownable } from './util/Ownable.sol';
 contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
     bytes32 internal constant PREFIX_COMMAND_EXECUTED = keccak256('command-executed');
     bytes32 internal constant PREFIX_CONTRACT_CALL_APPROVED = keccak256('contract-call-approved');
+    bytes32 internal constant PAUSED = keccak256('paused');
 
     bytes32 internal constant SELECTOR_APPROVE_CONTRACT_CALL = keccak256('approveContractCall');
     bytes32 internal constant SELECTOR_TRANSFER_OPERATORSHIP = keccak256('transferOperatorship');
@@ -27,6 +28,12 @@ contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
 
     modifier onlySelf() {
         if (msg.sender != address(this)) revert NotSelf();
+
+        _;
+    }
+
+    modifier onlyNotPaused() {
+        if (this.isPaused()) revert Paused();
 
         _;
     }
@@ -72,11 +79,23 @@ contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
         return getBool(_getIsCommandExecutedKey(commandId));
     }
 
+    function isPaused() external view override returns (bool) {
+        return getBool(PAUSED);
+    }
+
     /**********************\
     |* External Functions *|
     \**********************/
 
-    function execute(bytes calldata input) external override {
+    function pause() external override onlyOwner {
+        _setPauseStatus(true);
+    }
+
+    function unpause() external override onlyOwner {
+        _setPauseStatus(false);
+    }
+
+    function execute(bytes calldata input) external override onlyNotPaused {
         (bytes memory data, bytes memory proof) = abi.decode(input, (bytes, bytes));
 
         bytes32 messageHash = ECDSA.toEthSignedMessageHash(keccak256(data));
@@ -174,6 +193,10 @@ contract AxelarGateway is EternalStorage, Ownable, IAxelarGateway {
 
     function _setCommandExecuted(bytes32 commandId, bool executed) internal {
         _setBool(_getIsCommandExecutedKey(commandId), executed);
+    }
+
+    function _setPauseStatus(bool status) internal {
+        _setBool(PAUSED, status);
     }
 
     function _setContractCallApproved(
