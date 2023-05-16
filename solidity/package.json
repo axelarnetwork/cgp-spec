@@ -1,0 +1,41 @@
+{
+  "name": "@axelar-network/cgp-spec",
+  "version": "1.0.0",
+  "description": "Axelar CGP Solidity Reference Implementation",
+  "main": "index.js",
+  "scripts": {
+    "build": "rm -rf artifacts cache && hardhat compile",
+    "test": "hardhat test",
+    "lint": "solhint 'contracts/**/*.sol'",
+    "prettier": "prettier --write 'contracts/**/*.sol' '*.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelarnetwork/cgp-spec.git"
+  },
+  "keywords": [
+    "axelar"
+  ],
+  "author": "axelar-network",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "chai": "^4.3.7",
+    "dotenv": "^16.0.1",
+    "eslint": "^8.36.0",
+    "eslint-config-richardpringle": "^2.0.0",
+    "ethers": "^5.7.2",
+    "fs-extra": "^11.1.1",
+    "hardhat": "^2.13.0",
+    "lodash": "^4.17.21",
+    "mocha": "^10.2.0",
+    "prettier": "^2.8.7",
+    "prettier-plugin-solidity": "1.0.0-beta.19",
+    "readline-sync": "^1.4.10",
+    "solhint": "^3.4.1"
+  },
+  "engines": {
+    "node": "^16.0.0 || ^18.0.0"
+  }
+}
