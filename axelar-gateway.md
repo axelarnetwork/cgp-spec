@@ -1,4 +1,5 @@
-This is to be used as a reference for implementing gateways on Axelar.
+This is to be used as a reference for implementing gateways on on the Axelar network.
+This gateway can subsequently be used to plug into the router contracts on the Axelar network to interop with other blockchains.
 
 # Message Semantics
 Structure of a routing packet (`M` in the diagrams)
