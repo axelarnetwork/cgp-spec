@@ -1,4 +1,4 @@
-## Cross-Chain Gateway Protocol EVM Spec 
+## Cross-Chain Gateway Protocol Cosmwasm Spec 
 
 #### Uniquely referencing a transaction on the source chain.
 
