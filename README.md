@@ -18,7 +18,7 @@ At the core, CGP supports innovation at all layers of the stack: the protocol is
 
 Table of content: 
 * [The design principles](cgp-design.md)
-* [EVM gateway v1](cgp-gateway-v1.md) 
-* [Cosmwasm gateway v1](cgp-axelarnet-gateway-v1.md) (to be instantiated on the Axelar network or other Rust-based chains)
+* [EVM gateway v1](cgp-evm-v1.md) 
+* [Cosmwasm gateway v1](cgp-cosmwasm-v1.md) (to be instantiated on the Axelar network or other Rust-based chains)
 * [Router spec v1](cap-router-v1.md) (should be available on the Axelar network; your chain connections will interact with it to send messages to all other chains)
 
