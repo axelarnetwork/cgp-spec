@@ -12,7 +12,7 @@ If you're building a gateway on the Axelar network, you'll need to connect to on
 
 CGP establishes the simplest packet semantics possible to establish robust and future-proof connectivity. You can watch a [talk at Stanford University](https://www.youtube.com/watch?v=6XFMzdXV_I4) on some of its design principles and read [the design document](cgp-design.md). 
 
-At the core, CGP supports innovation at all layers of the stack: the protocol is free and do not introduce any vendor locking, it's consensus agnostic allowing L1/L2/L3 innovation, and simple to build and operate. You can build more complex semantics on top of it, like IBC, reliable delivery, multi-sends, etc. 
+At the core, CGP supports innovation at all layers of the stack: the protocol is free and does not introduce any vendor locking, it's consensus agnostic allowing L1/L2/L3 innovation, and simple to build and operate. You can build more complex semantics on top of it, like IBC, reliable delivery, multi-sends, etc. 
 
 ![Alt text](images/flow-overview.png)
 
