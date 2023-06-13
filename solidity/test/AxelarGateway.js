@@ -10,7 +10,7 @@ describe('AxelarGateway', () => {
     const threshold = 4;
 
     let wallets;
-    let owner;
+    let user;
     let operators;
     let weights;
 
@@ -22,12 +22,12 @@ describe('AxelarGateway', () => {
 
     before(async () => {
         wallets = await ethers.getSigners();
-        owner = wallets[0];
+        user = wallets[0];
         operators = sortBy(wallets.slice(0, threshold), (wallet) => wallet.address.toLowerCase());
         weights = Array(operators.length).fill(1);
 
-        gatewayFactory = await ethers.getContractFactory('AxelarGateway', owner);
-        authFactory = await ethers.getContractFactory('AxelarAuthWeighted', owner);
+        gatewayFactory = await ethers.getContractFactory('AxelarGateway', user);
+        authFactory = await ethers.getContractFactory('AxelarAuthWeighted', user);
     });
 
     const deployGateway = async () => {
@@ -44,16 +44,26 @@ describe('AxelarGateway', () => {
         await auth.transferOwnership(gateway.address).then((tx) => tx.wait());
     };
 
-    describe('call contract approval', () => {
+    describe('call contract', () => {
         beforeEach(async () => {
             await deployGateway();
         });
 
+        it('should emit contract call event', async () => {
+            const destinationChain = "Destination";
+            const destinationAddress = "0x123abc";
+            const payload = defaultAbiCoder.encode(['address'], [user.address]);
+
+            const tx = await gateway.connect(user).callContract(destinationChain, destinationAddress, payload);
+
+            expect(tx).to.emit(gateway, 'ContractCall').withArgs(user.address, destinationChain, destinationAddress, keccak256(payload), payload);
+        });
+
         it('should approve and validate contract call', async () => {
-            const payload = defaultAbiCoder.encode(['address'], [owner.address]);
+            const payload = defaultAbiCoder.encode(['address'], [user.address]);
             const payloadHash = keccak256(payload);
             const commandId = getRandomID();
-            const sourceChain = 'Polygon';
+            const sourceChain = 'Source';
             const sourceAddress = 'address0x123';
             const sourceTxHash = keccak256('0x123abc123abc');
             const sourceEventIndex = 17;
@@ -62,7 +72,7 @@ describe('AxelarGateway', () => {
                 await getChainId(),
                 [commandId],
                 ['approveContractCall'],
-                [getApproveContractCall(sourceChain, sourceAddress, owner.address, payloadHash, sourceTxHash, sourceEventIndex)],
+                [getApproveContractCall(sourceChain, sourceAddress, user.address, payloadHash, sourceTxHash, sourceEventIndex)],
             );
 
             const approveInput = await getSignedWeightedExecuteInput(
@@ -75,21 +85,21 @@ describe('AxelarGateway', () => {
 
             await expect(gateway.execute(approveInput))
                 .to.emit(gateway, 'ContractCallApproved')
-                .withArgs(commandId, sourceChain, sourceAddress, owner.address, payloadHash, sourceTxHash, sourceEventIndex);
+                .withArgs(commandId, sourceChain, sourceAddress, user.address, payloadHash, sourceTxHash, sourceEventIndex);
 
             const isApprovedBefore = await gateway.isContractCallApproved(
                 commandId,
                 sourceChain,
                 sourceAddress,
-                owner.address,
+                user.address,
                 payloadHash,
             );
 
             expect(isApprovedBefore).to.be.true;
 
-            await gateway.connect(owner).validateContractCall(commandId, sourceChain, sourceAddress, payloadHash).then((tx) => tx.wait());
+            await gateway.connect(user).validateContractCall(commandId, sourceChain, sourceAddress, payloadHash).then((tx) => tx.wait());
 
-            const isApprovedAfter = await gateway.isContractCallApproved(commandId, sourceChain, sourceAddress, owner.address, payloadHash);
+            const isApprovedAfter = await gateway.isContractCallApproved(commandId, sourceChain, sourceAddress, user.address, payloadHash);
 
             expect(isApprovedAfter).to.be.false;
         });
