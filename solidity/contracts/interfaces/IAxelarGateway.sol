@@ -11,7 +11,6 @@ interface IAxelarGateway {
     error InvalidAuthModule();
     error InvalidChainId();
     error InvalidCommands();
-    error Paused();
 
     /**********\
     |* Events *|
@@ -68,15 +67,9 @@ interface IAxelarGateway {
 
     function isCommandExecuted(bytes32 commandId) external view returns (bool);
 
-    function isPaused() external view returns (bool);
-
     /**********************\
     |* External Functions *|
     \**********************/
 
     function execute(bytes calldata input) external;
-
-    function pause() external;
-
-    function unpause() external;
 }
