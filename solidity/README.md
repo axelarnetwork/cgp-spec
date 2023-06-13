@@ -2,12 +2,14 @@
 
 This folder contains the reference implementation of the [CGP protocol](../cgp-v1.md) in Solidity.
 
-## Compile
+## Build
 
 ```bash
 npm ci
 
 npm run build
+
+npm run test
 ```
 
 ## Design
