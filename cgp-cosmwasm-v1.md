@@ -30,9 +30,9 @@ Gateway interfaces
 ```
 pub trait Gateway{
 	Verify([]Message: msgs)
-	Route([]Message: msgs)    
-    CallContract(string: destination chain, string: destination address, []byte payload)
-    Execute(string: msg_id, []byte: payload)
+	Route([]Message: msgs)
+	CallContract(string: destination chain, string: destination address, []byte payload)
+	Execute(string: msg_id, []byte: payload)
 }
 ```
 
