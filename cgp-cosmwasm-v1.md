@@ -31,10 +31,15 @@ Gateway interfaces
 pub trait Gateway{
 	Verify([]Message: msgs)
 	Route([]Message: msgs)
+}
+
+pub trait GatewayEndpoint{
 	CallContract(string: destination chain, string: destination address, []byte payload)
 	Execute(string: msg_id, []byte: payload)
 }
 ```
+Only gateway endpoints, i.e. gateways that are either called by or are calling out to third-party smart contracts need to implement the `GatewayEndpoint` interface.
+
 
 ### Example: Avalanche → Moonbeam
 
