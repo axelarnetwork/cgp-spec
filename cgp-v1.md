@@ -120,6 +120,6 @@ For executing the messages, application contract is responsible for calling `val
 
 ### Instantiation
 
-List of known discrepancies between the spec above and the [Solidity reference implementation](/cgp-spec/tree/main/solidity)the reference implementation. 
+List of known discrepancies between the spec above and the [Solidity reference implementation](/solidity) the reference implementation. 
 * `transactionId` is used instead of `commandId`. 
 
