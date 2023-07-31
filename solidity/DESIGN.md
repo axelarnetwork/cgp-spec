@@ -2,7 +2,7 @@
 
 The Axelar Chross-Chain Gateway Protocol (CGP) enables cross-chain communication between EVM compatible blockchains. This is achieved using a decentralized network of validators that act as an integration point, relaying messages between the source blockchain and the destination blockchain.
 
-In this document, we will discuss the protocol implementation, with an emphasis on the general terms and established naming conventions.
+This document describes the protocol implementation, with an emphasis on the general terms and established naming convention.
 
 ## AxelarAuthWeighted Contract
 
@@ -77,7 +77,5 @@ The function `_execute` is a placeholder for developers to build their logic on 
 By overriding the `_execute` function, developers can interface directly with the incoming Axelar messages and interpret them according to their Dapp's requirements.
 
 ## Conclusion
-
-The Axelar CGP protocol offers a highly scalable mechanism for communication between blockchains. By ensuring message authenticity, validity, and maintaining state between chains, it enables a highly reliable cross-chain communication.
 
 Please note that this documentation provides a summary of the protocol and its intended use. For a detailed understanding of the protocol, please refer to the contract code discussed above in the given context.
