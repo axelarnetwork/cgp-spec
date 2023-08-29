@@ -1,6 +1,6 @@
 # Axelar CGP Solidity Implementation Details
 
-The Axelar Chross-Chain Gateway Protocol (CGP) enables cross-chain communication between EVM compatible blockchains. This is achieved using a decentralized network of validators that act as an integration point, relaying messages between the source blockchain and the destination blockchain.
+The Axelar Cross-Chain Gateway Protocol (CGP) enables cross-chain communication between EVM compatible blockchains. This is achieved using a decentralized network of validators that act as an integration point, relaying messages between the source blockchain and the destination blockchain.
 
 This document describes the protocol implementation, with an emphasis on the general terms and established naming convention.
 
