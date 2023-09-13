@@ -24,7 +24,7 @@ Auxiliary contracts might include an ability to upgrade the gateway contract, an
 
 ## Cross-chain contract call flow
 
-Here's a detailed breakdown of a real-world cross-chain [contract call](https://axelarscan.io/gmp/0x93cb0b614b07d6050b164cc3e35da617a2fbefc13069a35369894cac74b861a2:54).
+Here's a detailed breakdown of a real-world cross-chain [contract call](https://axelarscan.io/gmp/0x93cb0b614b07d6050b164cc3e35da617a2fbefc13069a35369894cac74b861a2:54). A high level flow diagram can be found [here](https://docs.axelar.dev/dev/general-message-passing/overview).
 
 1. Setup:
    a. Destination app contract implements the `IAxelarExecutable.sol` interface to receive the message.
