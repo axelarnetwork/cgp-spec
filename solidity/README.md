@@ -22,9 +22,9 @@ npm run test
 
 Auxiliary contracts might include an ability to upgrade the gateway contract, and a multisig smart contract wallet to manage upgrades of the gateway.
 
-## Flows
+## Cross-chain contract call flow
 
-You can follow along the steps with this real world cross-chain message [example](https://axelarscan.io/gmp/0x93cb0b614b07d6050b164cc3e35da617a2fbefc13069a35369894cac74b861a2:54).
+Here's a detailed breakdown of a real-world cross-chain [contract call](https://axelarscan.io/gmp/0x93cb0b614b07d6050b164cc3e35da617a2fbefc13069a35369894cac74b861a2:54).
 
 1. Setup:
    a. Destination app contract implements the `IAxelarExecutable.sol` interface to receive the message.
