@@ -27,8 +27,8 @@ Auxiliary contracts might include an ability to upgrade the gateway contract, an
 Here's a detailed breakdown of a real-world cross-chain [contract call](https://axelarscan.io/gmp/0x93cb0b614b07d6050b164cc3e35da617a2fbefc13069a35369894cac74b861a2:54). A high level flow diagram can be found [here](https://docs.axelar.dev/dev/general-message-passing/overview).
 
 1. Setup:
-   a. Destination app contract implements the `IAxelarExecutable.sol` interface to receive the message.
-   b. Destination app contract stores the destination gateway address.
+   - Destination app contract implements the `IAxelarExecutable.sol` interface to receive the message.
+   - Destination app contract stores the destination gateway address.
 2. Smart contract on source chain [calls](https://moonscan.io/tx/0x93cb0b614b07d6050b164cc3e35da617a2fbefc13069a35369894cac74b861a2) `AxelarGateway.callContract()` with the destination chain/address, and `payload`, which emits the `ContractCall` event.
 3. Smart contract can also optionally deposit tokens to the [AxelarGasService](https://github.com/axelarnetwork/axelar-cgp-solidity/blob/main/contracts/gas-service/AxelarGasService.sol#L122) in the same tx to pay Axelar’s relayer for submitting all the intermediate txs for the cross-chain call execution.
 4. A relayer monitors this event and submits a tx on Axelar to request validation. It also stores the `payload` in a traditional database, keyed by the `hash(payload)` to be retrieved later for execution on the destination.
